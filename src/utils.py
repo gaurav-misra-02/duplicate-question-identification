@@ -32,23 +32,23 @@ def data_generator(
     """
     input1 = []
     input2 = []
-    idx = 0
-    len_q = len(Q1)
-    question_indexes = list(range(len_q))
+    current_index = 0
+    num_questions = len(Q1)
+    question_indexes = list(range(num_questions))
     
     if shuffle:
         rnd.shuffle(question_indexes)
     
     while True:
-        if idx >= len_q:
-            idx = 0
+        if current_index >= num_questions:
+            current_index = 0
             if shuffle:
                 rnd.shuffle(question_indexes)
         
-        q1 = Q1[question_indexes[idx]]
-        q2 = Q2[question_indexes[idx]]
+        q1 = Q1[question_indexes[current_index]]
+        q2 = Q2[question_indexes[current_index]]
         
-        idx += 1
+        current_index += 1
         input1.append(q1)
         input2.append(q2)
         
@@ -61,15 +61,15 @@ def data_generator(
             max_len = 2 ** int(np.ceil(np.log2(max_len)))
             
             # Pad questions to max_len
-            b1 = []
-            b2 = []
+            batch_1 = []
+            batch_2 = []
             for q1, q2 in zip(input1, input2):
                 q1_padded = q1 + [pad] * (max_len - len(q1))
                 q2_padded = q2 + [pad] * (max_len - len(q2))
-                b1.append(q1_padded)
-                b2.append(q2_padded)
+                batch_1.append(q1_padded)
+                batch_2.append(q2_padded)
             
-            yield np.array(b1), np.array(b2)
+            yield np.array(batch_1), np.array(batch_2)
             
             # Reset batches
             input1, input2 = [], []

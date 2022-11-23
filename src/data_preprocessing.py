@@ -75,11 +75,11 @@ def build_vocabulary(Q1_train_words: np.ndarray, Q2_train_words: np.ndarray) -> 
     Q1_train = np.empty_like(Q1_train_words)
     Q2_train = np.empty_like(Q2_train_words)
     
-    for idx in range(len(Q1_train_words)):
-        Q1_train[idx] = nltk.word_tokenize(Q1_train_words[idx])
-        Q2_train[idx] = nltk.word_tokenize(Q2_train_words[idx])
+    for index in range(len(Q1_train_words)):
+        Q1_train[index] = nltk.word_tokenize(Q1_train_words[index])
+        Q2_train[index] = nltk.word_tokenize(Q2_train_words[index])
         
-        combined_tokens = Q1_train[idx] + Q2_train[idx]
+        combined_tokens = Q1_train[index] + Q2_train[index]
         for word in combined_tokens:
             if word not in vocab:
                 vocab[word] = len(vocab) + 1
@@ -98,8 +98,8 @@ def tokenize_questions(Q_words: np.ndarray) -> np.ndarray:
         Array of tokenized questions
     """
     Q_tokens = np.empty_like(Q_words)
-    for idx in range(len(Q_words)):
-        Q_tokens[idx] = nltk.word_tokenize(Q_words[idx])
+    for index in range(len(Q_words)):
+        Q_tokens[index] = nltk.word_tokenize(Q_words[index])
     return Q_tokens
 
 

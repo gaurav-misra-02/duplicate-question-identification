@@ -8,7 +8,7 @@ from trax.fastmath import numpy as fastnp
 from functools import partial
 
 
-def normalize(x):
+def l2_normalize(x):
     """
     Normalize vectors to unit L2 norm.
     
@@ -46,7 +46,7 @@ def create_siamese_model(vocab_size: int = 41699, d_model: int = 128, mode: str 
         tl.Embedding(vocab_size, d_model),
         tl.LSTM(d_model),
         tl.Mean(axis=1),
-        tl.Fn('Normalize', lambda x: normalize(x)),
+        tl.Fn('Normalize', lambda x: l2_normalize(x)),
     )
     
     # Process both questions in parallel with shared weights
@@ -54,7 +54,7 @@ def create_siamese_model(vocab_size: int = 41699, d_model: int = 128, mode: str 
     return model
 
 
-def triplet_loss_fn(v1: fastnp.ndarray, v2: fastnp.ndarray, margin: float = 0.25) -> float:
+def triplet_loss_fn(embeddings_1: fastnp.ndarray, embeddings_2: fastnp.ndarray, margin: float = 0.25) -> float:
     """
     Compute triplet loss with hard negative mining.
     
@@ -68,15 +68,15 @@ def triplet_loss_fn(v1: fastnp.ndarray, v2: fastnp.ndarray, margin: float = 0.25
         L = mean(L1 + L2)
     
     Args:
-        v1: Embeddings for first set of questions (batch_size, d_model)
-        v2: Embeddings for second set of questions (batch_size, d_model)
+        embeddings_1: Embeddings for first set of questions (batch_size, d_model)
+        embeddings_2: Embeddings for second set of questions (batch_size, d_model)
         margin: Margin for triplet loss (default: 0.25)
     
     Returns:
         Scalar loss value
     """
     # Compute pairwise cosine similarities
-    scores = fastnp.dot(v1, v2.T)
+    scores = fastnp.dot(embeddings_1, embeddings_2.T)
     batch_size = len(scores)
     
     # Extract positive pairs (diagonal elements)

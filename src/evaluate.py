@@ -11,7 +11,7 @@ from typing import Dict, Callable, Tuple
 def classify(
     test_Q1: np.ndarray,
     test_Q2: np.ndarray,
-    y: np.ndarray,
+    labels: np.ndarray,
     threshold: float,
     model,
     vocab: Dict,
@@ -27,7 +27,7 @@ def classify(
     Args:
         test_Q1: First set of test questions (encoded)
         test_Q2: Second set of test questions (encoded)
-        y: Ground truth labels (1 for duplicate, 0 for not duplicate)
+        labels: Ground truth labels (1 for duplicate, 0 for not duplicate)
         threshold: Similarity threshold for classification
         model: Trained Siamese model
         vocab: Vocabulary dictionary
@@ -41,23 +41,23 @@ def classify(
     
     for i in range(0, len(test_Q1), batch_size):
         # Get batch
-        q1, q2 = next(data_generator(
+        q1_batch, q2_batch = next(data_generator(
             test_Q1[i:i + batch_size],
             test_Q2[i:i + batch_size],
             batch_size,
             vocab['<PAD>'],
             shuffle=False
         ))
-        y_batch = y[i:i + batch_size]
+        labels_batch = labels[i:i + batch_size]
         
         # Get embeddings
-        v1, v2 = model([q1, q2])
+        embeddings_1, embeddings_2 = model([q1_batch, q2_batch])
         
         # Compute similarities and classify
         for j in range(batch_size):
-            similarity = fastnp.dot(v1[j], v2[j])
+            similarity = fastnp.dot(embeddings_1[j], embeddings_2[j])
             prediction = similarity > threshold
-            accuracy += (y_batch[j] == prediction)
+            accuracy += (labels_batch[j] == prediction)
     
     return accuracy / len(test_Q1)
 
@@ -91,17 +91,17 @@ def predict(
     q2_tokens = nltk.word_tokenize(question2)
     
     # Encode questions (OOV words get 0)
-    Q1 = [vocab.get(word, 0) for word in q1_tokens]
-    Q2 = [vocab.get(word, 0) for word in q2_tokens]
+    Q1_encoded = [vocab.get(word, 0) for word in q1_tokens]
+    Q2_encoded = [vocab.get(word, 0) for word in q2_tokens]
     
     # Pad questions
     Q1_padded, Q2_padded = next(data_generator(
-        [Q1], [Q2], 1, vocab['<PAD>'], shuffle=False
+        [Q1_encoded], [Q2_encoded], 1, vocab['<PAD>'], shuffle=False
     ))
     
     # Get embeddings and compute similarity
-    v1, v2 = model([Q1_padded, Q2_padded])
-    similarity = float(fastnp.dot(v1, v2.T)[0][0])
+    embeddings_1, embeddings_2 = model([Q1_padded, Q2_padded])
+    similarity = float(fastnp.dot(embeddings_1, embeddings_2.T)[0][0])
     is_duplicate = similarity > threshold
     
     if verbose:
