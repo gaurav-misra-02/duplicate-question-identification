@@ -20,7 +20,7 @@ def load_model_and_vocab(model_path='models/model.pkl.gz', vocab_path='vocab.pkl
     try:
         with open(vocab_path, 'rb') as f:
             vocab = pickle.load(f)
-        print(f"✓ Loaded vocabulary with {len(vocab)} tokens")
+        print(f"Loaded vocabulary with {len(vocab)} tokens")
     except FileNotFoundError:
         print(f"Error: Vocabulary file not found at {vocab_path}")
         print("Please ensure you have vocab.pkl in the project root.")
@@ -30,7 +30,7 @@ def load_model_and_vocab(model_path='models/model.pkl.gz', vocab_path='vocab.pkl
     try:
         model = create_siamese_model(vocab_size=len(vocab), d_model=128)
         model.init_from_file(model_path)
-        print(f"✓ Loaded trained model from {model_path}")
+        print(f"Loaded trained model from {model_path}")
     except FileNotFoundError:
         print(f"Error: Model file not found at {model_path}")
         print("Please ensure you have trained model in the models/ directory.")
@@ -92,7 +92,7 @@ def demo_predictions(model, vocab, threshold=0.7):
             verbose=False
         )
         
-        result = "✓ DUPLICATE" if is_duplicate else "✗ NOT DUPLICATE"
+        result = "DUPLICATE" if is_duplicate else "NOT DUPLICATE"
         print(f"Prediction: {result}")
         print(f"Similarity Score: {similarity:.4f} (threshold: {threshold})")
     
@@ -130,7 +130,7 @@ def interactive_mode(model, vocab, threshold=0.7):
                 verbose=False
             )
             
-            result = "✓ DUPLICATE" if is_duplicate else "✗ NOT DUPLICATE"
+            result = "DUPLICATE" if is_duplicate else "NOT DUPLICATE"
             print(f"Prediction: {result}")
             print(f"Similarity Score: {similarity:.4f}")
             print("="*80 + "\n")
