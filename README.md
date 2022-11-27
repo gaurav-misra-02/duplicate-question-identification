@@ -2,11 +2,11 @@
 
 A deep learning system for identifying semantically similar questions using Siamese LSTM networks with triplet loss and hard negative mining.
 
-## 🎯 Problem Statement
+## Problem Statement
 
 Question-answering platforms like Quora often have multiple versions of the same question posted by different users. This creates redundancy and fragments answers across similar questions. This project tackles the challenge of automatically identifying duplicate questions to improve content organization and user experience.
 
-## 🏗️ Architecture
+## Architecture
 
 The system uses a **Siamese Neural Network** architecture with shared weights to process question pairs:
 
@@ -27,14 +27,14 @@ Question 2 ──→ [Embedding] ──→ [LSTM] ──→ [Mean Pool] ──�
 - Combines closest negative and mean negative for robust training
 - Adam optimizer with learning rate warmup and inverse square root decay
 
-## 📊 Performance
+## Performance
 
 - **Accuracy**: ~69% on test set
 - **Dataset**: Quora Question Pairs (~400K pairs)
 - **Vocabulary Size**: 36,268 unique tokens
 - **Training Samples**: 89,188 duplicate pairs
 
-## 🚀 Installation
+## Installation
 
 ```bash
 # Clone the repository
@@ -48,7 +48,7 @@ pip install -r requirements.txt
 python -c "import nltk; nltk.download('punkt')"
 ```
 
-## 💻 Usage
+## Usage
 
 ### Quick Start
 
@@ -95,7 +95,7 @@ set_random_seed(42)
 
 # Load and prepare data
 data_train, data_test = load_data('data/questions.csv')
-vocab, train_Q1, train_Q2, val_Q1, val_Q2, Q1_test, Q2_test, y_test = prepare_data(
+vocab, train_Q1, train_Q2, val_Q1, val_Q2, Q1_test, Q2_test, labels_test = prepare_data(
     data_train, data_test
 )
 
@@ -124,7 +124,9 @@ from src.evaluate import classify
 
 # Evaluate on test set
 accuracy = classify(
-    Q1_test, Q2_test, y_test,
+    test_Q1=Q1_test,
+    test_Q2=Q2_test,
+    labels=y_test,
     threshold=0.7,
     model=model,
     vocab=vocab,
@@ -135,7 +137,7 @@ accuracy = classify(
 print(f"Test Accuracy: {accuracy:.2%}")
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 duplicate-question-identification/
@@ -156,7 +158,7 @@ duplicate-question-identification/
 └── data/                          # Dataset (not included)
 ```
 
-## 🔬 Technical Details
+## Technical Details
 
 ### Loss Function
 
@@ -177,14 +179,14 @@ Instead of using random negative examples, the model identifies the "hardest" ne
 - Training uses only duplicate pairs; negatives are implicitly generated from batch structure
 - For batch size N, each question Q1[i] has 1 positive (Q2[i]) and N-1 negatives (Q2[j] where j≠i)
 
-## 🎓 Key Learnings
+## Key Learnings
 
 1. **Siamese Networks**: Effective for learning similarity functions with shared representations
 2. **Triplet Loss**: Better than binary classification for ranking and similarity tasks
 3. **Hard Negative Mining**: Significantly improves convergence and final performance
 4. **Batch Structure**: Clever data organization can generate multiple training signals from a single batch
 
-## 🔮 Future Improvements
+## Future Improvements
 
 - [ ] Implement attention mechanisms for better sequence modeling
 - [ ] Experiment with transformer-based encoders (BERT, RoBERTa)
@@ -194,11 +196,11 @@ Instead of using random negative examples, the model identifies the "hardest" ne
 - [ ] Add visualization of embeddings (t-SNE, UMAP)
 - [ ] Experiment with different similarity metrics
 
-## 📝 License
+## License
 
 MIT License - feel free to use this project for learning or commercial purposes.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Dataset: [Quora Question Pairs](https://www.kaggle.com/c/quora-question-pairs)
 - Framework: [Google Trax](https://github.com/google/trax)
